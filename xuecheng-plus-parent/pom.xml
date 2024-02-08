@@ -36,6 +36,7 @@
 
     <dependencyManagement>
         <dependencies>
+
             <dependency>
                 <groupId>org.springframework.cloud</groupId>
                 <artifactId>spring-cloud-dependencies</artifactId>
@@ -183,6 +184,7 @@
                 <version>${elasticsearch.version}</version>
             </dependency>
         </dependencies>
+
     </dependencyManagement>
 
     <build>

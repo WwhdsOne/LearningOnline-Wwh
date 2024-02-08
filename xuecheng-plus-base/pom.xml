@@ -9,6 +9,7 @@
         <!--基于当前地址找父工程pom文件-->
         <relativePath>../xuecheng-plus-parent</relativePath>
     </parent>
+    <packaging>pom</packaging>
 
 
     <artifactId>xuecheng-plus-base</artifactId>
@@ -94,6 +95,12 @@
             <groupId>com.fasterxml.jackson.datatype</groupId>
             <artifactId>jackson-datatype-jsr310</artifactId>
         </dependency>
+
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+        </dependency>
+
     </dependencies>
 
 </project>
