@@ -1,0 +1,41 @@
+### 查询课程信息
+POST {{content_host}}/content/course/list?pageNo=1&pageSize=2
+Content-Type: application/json
+
+{
+  "auditStatus": "202004",
+  "courseName": "java",
+  "publishStatus": ""
+}
+
+### 查询全部课程分类
+GET {{content_host}}/content/course-category/tree-nodes
+
+### 新增课程
+POST {{content_host}}/content/course
+Content-Type: application/json
+
+{
+  "charge": "201001",
+  "price": -1,
+  "originalPrice":-1,
+  "qq": "22333",
+  "wechat": "223344",
+  "phone": "13333333",
+  "validDays": 365,
+  "mt": "1-1",
+  "st": "1-1-1",
+  "name": "测试课程103",
+  "pic": "",
+  "teachmode": "200002",
+  "users": "初级人员",
+  "tags": "",
+  "grade": "204001",
+  "description": ""
+}
+
+
+### 课程查询
+GET {{content_host}}/content/course/40
+Content-Type: application/json
+

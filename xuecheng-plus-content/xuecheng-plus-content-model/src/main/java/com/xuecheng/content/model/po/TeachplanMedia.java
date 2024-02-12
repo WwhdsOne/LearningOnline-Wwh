@@ -6,17 +6,22 @@ import java.time.LocalDateTime;
 import com.baomidou.mybatisplus.annotation.FieldFill;
 import com.baomidou.mybatisplus.annotation.TableField;
 import java.io.Serializable;
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import com.baomidou.mybatisplus.annotation.TableName;
+import lombok.NoArgsConstructor;
 
 /**
  * <p>
- * 
+ *
  * </p>
  *
  * @author itcast
  */
 @Data
+@NoArgsConstructor
+@AllArgsConstructor
 @TableName("teachplan_media")
 public class TeachplanMedia implements Serializable {
 
