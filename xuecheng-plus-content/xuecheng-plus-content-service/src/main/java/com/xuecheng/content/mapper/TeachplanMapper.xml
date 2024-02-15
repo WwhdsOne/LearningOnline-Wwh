@@ -26,6 +26,38 @@
     <sql id="Base_Column_List">
         id, pname, parentid, grade, media_type, start_time, end_time, description, timelength, orderby, course_id, course_pub_id, status, is_preview, create_date, change_date
     </sql>
+    <!--根据方向和ID修改顺序-->
+    <update id="updateOrderByDirectionAndId">
+        update teachplan T1,
+            teachplan T2,
+            <if test="direction != null and direction == 'movedown'.toString()">
+                (SELECT id,orderby
+                FROM teachplan T3
+                WHERE T3.course_id = #{teachplan.courseId}
+                AND T3.orderby > #{teachplan.orderby}
+                AND T3.parentid = #{teachplan.parentid}
+                ORDER BY T3.orderby
+                limit 1) T4
+            </if>
+            <if test="direction != null and direction == 'moveup'.toString()">
+                (SELECT id,orderby
+                FROM teachplan T3
+                WHERE T3.course_id = #{teachplan.courseId}
+                AND T3.orderby &lt; #{teachplan.orderby}
+                AND T3.parentid = #{teachplan.parentid}
+                ORDER BY T3.orderby desc
+                limit 1) T4
+            </if>
+        SET T2.orderby = T1.orderby,
+            T1.orderby = T2.orderby
+        where T1.parentid = T2.parentid
+          AND T1.course_id = T2.course_id
+          AND T1.parentid = #{teachplan.parentid}
+          AND T1.course_id = #{teachplan.courseId}
+          AND T1.orderby = #{teachplan.orderby}
+          AND T2.orderby = T4.orderby
+          AND T1.id != T4.id;
+    </update>
     <resultMap id="treeNodeResultMap" type="com.xuecheng.content.model.dto.TeachplanDTO">
         <!-- 一级数据映射 -->
         <id     column="one_id"        property="id" />
@@ -83,7 +115,7 @@
                m1.id             teachplanMeidaId,
                m1.media_id       mediaId
         from teachplan one
-                 inner join teachplan two on two.parentid = one.id
+                 left join teachplan two on two.parentid = one.id
                  left join teachplan_media m1 on m1.teachplan_id = two.id
         where one.parentid = 0
           and one.course_id = #{courseId}

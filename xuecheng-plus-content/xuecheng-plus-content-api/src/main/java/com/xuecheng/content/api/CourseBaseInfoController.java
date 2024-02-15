@@ -56,4 +56,10 @@ public class CourseBaseInfoController{
         Long companyId = 1232141425L;
         return courseBaseInfoService.updateCourseBase(companyId,editCourseDTO);
     }
+
+    @ApiOperation("删除课程")
+    @DeleteMapping("/course/{courseId}")
+    public void deleteCourse(@PathVariable Long courseId){
+        courseBaseInfoService.deleteCourseById(courseId);
+    }
 }

@@ -18,7 +18,7 @@ Content-Type: application/json
 {
   "charge": "201001",
   "price": -1,
-  "originalPrice":-1,
+  "originalPrice": -1,
   "qq": "22333",
   "wechat": "223344",
   "phone": "13333333",
@@ -41,4 +41,40 @@ Content-Type: application/json
 
 ### 课程计划查询
 GET {{content_host}}/content/teachplan/117/tree-nodes
+
+### 查询课程教师
+GET {{content_host}}/content/courseTeacher/list/1
+
+### 新增课程老师
+POST {{content_host}}/content/courseTeacher
+Content-Type: application/json
+
+{
+  "courseId": 75,
+  "teacherName": "王老师",
+  "position": "教师职位",
+  "introduction": "教师简介"
+}
+
+### 修改教师
+PUT {{content_host}}/content/courseTeacher
+Content-Type: application/json
+
+{
+  "id": 22,
+  "courseId": 75,
+  "teacherName": "王老师",
+  "position": "教师职位+test",
+  "introduction": "教师简介",
+  "photograph": null,
+  "createDate": null
+}
+
+### 删除教师
+DELETE {{content_host}}/content/courseTeacher/course/75/22
+
+### 删除课程
+DELETE {{content_host}}/content/course/75
+
+
 
