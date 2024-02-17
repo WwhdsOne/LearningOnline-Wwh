@@ -1,7 +1,7 @@
 #微服务配置
 spring:
   application:
-    name: content-service
+    name: system-service
   cloud:
     nacos:
       server-addr: 192.168.101.65:8848
@@ -10,8 +10,9 @@ spring:
         group: xuecheng-plus-project
         file-extension: yaml
         refresh-enabled: true
+        shared-configs:
+          - data-id: logging-${spring.profiles.active}.yaml       #日志文件配置
+            group: xuecheng-plus-common
+            refresh: true
   profiles:
     active: dev
-# 日志文件配置路径
-logging:
-  config: classpath:log4j2-dev.xml

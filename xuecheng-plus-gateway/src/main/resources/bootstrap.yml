@@ -1,17 +1,19 @@
-#微服务配置
 spring:
   application:
-    name: content-service
+    name: gateway
   cloud:
     nacos:
       server-addr: 192.168.101.65:8848
+      discovery:
+        namespace: dev-Wwh
+        group: xuecheng-plus-project
       config:
         namespace: dev-Wwh
         group: xuecheng-plus-project
         file-extension: yaml
         refresh-enabled: true
         shared-configs:
-          - data-id: logging-${spring.profiles.active}.yaml       #日志文件配置
+          - data-id: logging-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
             refresh: true
   profiles:
