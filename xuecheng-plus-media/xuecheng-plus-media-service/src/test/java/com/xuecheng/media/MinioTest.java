@@ -2,23 +2,22 @@ package com.xuecheng.media;
 
 import com.j256.simplemagic.ContentInfo;
 import com.j256.simplemagic.ContentInfoUtil;
-import io.minio.GetObjectArgs;
-import io.minio.MinioClient;
-import io.minio.RemoveObjectArgs;
-import io.minio.UploadObjectArgs;
-import io.minio.errors.*;
+import io.minio.*;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.compress.utils.IOUtils;
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 
 import java.awt.*;
-import java.io.*;
+import java.io.FileOutputStream;
+import java.io.FilterInputStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.InvalidKeyException;
-import java.security.NoSuchAlgorithmException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * @author Wwh
@@ -76,8 +75,47 @@ public class MinioTest {
         //不要传远程流
         String source_MD5 = DigestUtils.md5Hex(inputStream);
         String local_MD5 = DigestUtils.md5Hex(Files.newInputStream(Paths.get("C:\\Users\\Wwhds\\Desktop\\Minio测试\\logo+test.png")));
-        if( source_MD5.equals(local_MD5) ){
+        if ( source_MD5.equals(local_MD5) ) {
             System.out.println("下载成功");
         }
     }
+
+    //将分块文件上传到Minio
+    @Test
+    public void testUploadChunk() throws Exception {
+        for ( int i = 0; i <=41; i++ ) {
+            UploadObjectArgs asiatrip = UploadObjectArgs.builder()
+                    .bucket("testbucket")         //指定桶
+                    .object("chunk/" + i)//指定对象名
+                    .filename("C:\\Users\\Wwhds\\Desktop\\分块测试\\chunk\\" + i)
+                    .build();
+            minioClient.uploadObject(asiatrip);
+            System.out.println("分块" + i + "上传成功");
+        }
+    }
+
+    //调用minio接口合并分块
+    @Test
+    public void testMergeChunk() throws Exception {
+//        List<ComposeSource> sources = new ArrayList<>();
+//
+//        for ( int i = 0; i < 41; i++ ) {
+//            sources.add(ComposeSource.builder().bucket("testbucket").object("chunk/" + i).build());
+//        }
+        List<ComposeSource> sources = Stream.iterate(0, i -> ++i)
+                .limit(42)
+                .map(i -> ComposeSource.builder()
+                        .bucket("testbucket")
+                        .object("chunk/" + i)
+                        .build())
+                .collect(Collectors.toList());
+        ComposeObjectArgs testbucket = ComposeObjectArgs.builder()
+                .bucket("testbucket")
+                .object("merge01.mp4")
+                .sources(sources)
+                .build();
+        minioClient.composeObject(testbucket);
+    }
+
+    //批量清理分块文件
 }
