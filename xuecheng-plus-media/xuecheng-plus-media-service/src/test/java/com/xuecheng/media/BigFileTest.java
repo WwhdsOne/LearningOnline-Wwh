@@ -6,6 +6,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import com.j256.simplemagic.ContentInfo;
+import com.j256.simplemagic.ContentInfoUtil;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.junit.jupiter.api.Test;
 
@@ -84,9 +86,21 @@ public class BigFileTest {
         System.out.println("合并完成");
         if ( DigestUtils.md5Hex(new FileInputStream(sourceFile)).equals(DigestUtils.md5Hex(new FileInputStream(mergeFile))) ) {
             System.out.println("文件一致");
-        }else {
+        } else {
             System.out.println("文件不一致");
         }
+    }
+
+    @Test
+    public void extension() {
+        ContentInfo mimeTypeMatch = ContentInfoUtil.findExtensionMatch(".avi");
+        System.out.println(mimeTypeMatch.getMimeType());
+    }
+
+    @Test
+    public void whereisTempFile() throws IOException {
+        File minio = File.createTempFile("minio", ".txt");
+        System.out.println(minio.getAbsolutePath());
     }
 
 

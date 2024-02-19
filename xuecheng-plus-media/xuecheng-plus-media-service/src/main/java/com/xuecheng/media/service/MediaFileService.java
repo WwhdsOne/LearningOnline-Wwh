@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
@@ -93,5 +94,30 @@ public interface MediaFileService {
      */
     RestResponse mergechunks(Long companyId, String fileMd5, int chunkTotal, UploadFileParamsDTO uploadFileParamsDTO) throws IOException;
 
+    /**
+     * @description 从minio下载文件
+     * @param bucket 桶名称
+     * @param objectName 对象名称
+     * @return com.xuecheng.base.model.RestResponse<java.lang.Boolean> true成功，false失败
+     */
+    File downloadFileFromMinIO(String bucket, String objectName);
 
+    /**
+     * @description 上传文件到minio
+     * @param localFilePath 本地文件路径
+     * @param mimeType 文件类型
+     * @param bucketName 桶名称
+     * @param objectName 对象名称
+     * @return com.xuecheng.base.model.RestResponse<java.lang.Boolean> true成功，false失败
+     */
+
+    boolean addMediaFilesToMinIO(String localFilePath, String mimeType, String bucketName, String objectName) throws Exception;
+
+
+    /**
+     * @description 更新媒资文件url
+     * @param fileId 文件id
+     * @param url 文件url
+     */
+    void updateById(MediaFiles mediaFiles);
 }
