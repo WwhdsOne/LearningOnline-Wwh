@@ -76,6 +76,9 @@ DELETE {{content_host}}/content/courseTeacher/course/75/22
 ### 删除课程
 DELETE {{content_host}}/content/course/75
 
+### freemarker测试
+GET {{content_host}}/content/testfreemarker
+
 
 
 

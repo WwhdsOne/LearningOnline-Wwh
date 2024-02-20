@@ -145,11 +145,6 @@ public class MediaFileServiceImpl implements MediaFileService {
         return false;
     }
 
-    /**
-     * 更新文件URL
-     * @param fileId 文件ID
-     * @param url    文件URL
-     */
     @Override
     public void updateById(MediaFiles mediaFiles) {
         mediaFilesMapper.updateById(mediaFiles);
@@ -471,7 +466,7 @@ public class MediaFileServiceImpl implements MediaFileService {
         //1.文件上传到Minio
         String fileName = uploadFileParamsDto.getFilename();
         //获取文件拓展名
-        String extension = StringUtils.substringAfterLast(fileName, ".");
+        String extension = fileName.substring(fileName.lastIndexOf("."));
 
         //根据拓展名获取媒体类型
         String mimeType = getMimeType(extension);
