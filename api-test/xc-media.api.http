@@ -7,3 +7,6 @@ Content-Disposition: form-data; name="filedata"; filename="logo-active.png"
 Content-Type: application/octet-stream
 
 < C:\Users\Wwhds\Desktop\logo\logo-active.png
+
+### 公开课预览
+GET {{media_host}}/media/open/preview/1a348331c8ca5fe5bd9fd40afd1c80ff

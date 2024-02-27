@@ -120,4 +120,10 @@ public interface MediaFileService {
      * @param url 文件url
      */
     void updateById(MediaFiles mediaFiles);
+
+    /**
+     * &#064;description  根据id获取文件
+     * @param mediaId 文件id
+     */
+    MediaFiles getFileById(String mediaId);
 }

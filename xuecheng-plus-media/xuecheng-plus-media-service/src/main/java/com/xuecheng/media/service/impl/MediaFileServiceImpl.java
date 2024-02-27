@@ -150,6 +150,11 @@ public class MediaFileServiceImpl implements MediaFileService {
         mediaFilesMapper.updateById(mediaFiles);
     }
 
+    @Override
+    public MediaFiles getFileById(String mediaId) {
+        return mediaFilesMapper.selectById(mediaId);
+    }
+
     /**
      * 获取文件MD5
      * @param file 文件
@@ -478,6 +483,7 @@ public class MediaFileServiceImpl implements MediaFileService {
 
         //objectName以年月日作为名称存储
         String objectName = defaultFolderPath + fileMd5 + extension;
+
 
         boolean result = addMediaFilesToMinIO(localFilePath, mimeType, bucket_mediaFiles, objectName);
         if ( !result ) {

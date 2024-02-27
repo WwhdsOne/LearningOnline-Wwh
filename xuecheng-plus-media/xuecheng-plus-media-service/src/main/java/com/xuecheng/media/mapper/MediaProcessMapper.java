@@ -21,7 +21,7 @@ public interface MediaProcessMapper extends BaseMapper<MediaProcess> {
      *
      * @param sharedTotal 分片总数
      * @param shardIndex  分片下标
-     * @param failCount   失败次数
+     * @param processors  失败次数
      * @return 媒资处理列表
      */
     @Select("select * from media_process m " +
