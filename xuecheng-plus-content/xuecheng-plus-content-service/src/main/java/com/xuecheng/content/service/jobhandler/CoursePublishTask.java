@@ -1,12 +1,17 @@
 package com.xuecheng.content.service.jobhandler;
 
+import com.xuecheng.base.exception.XueChengPlusException;
+import com.xuecheng.content.service.CoursePublishService;
 import com.xuecheng.messagesdk.model.po.MqMessage;
 import com.xuecheng.messagesdk.service.MessageProcessAbstract;
 import com.xuecheng.messagesdk.service.MqMessageService;
 import com.xxl.job.core.context.XxlJobHelper;
 import com.xxl.job.core.handler.annotation.XxlJob;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.io.File;
 
 /**
  * @author Wwh
@@ -17,6 +22,10 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 public class CoursePublishTask extends MessageProcessAbstract {
+
+    @Autowired
+    CoursePublishService coursePublishService;
+
 
     @XxlJob("CoursePublishJobHandler")
     public void coursePublish() throws Exception{
@@ -44,7 +53,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
      */
     //若抛出异常，会说明任务失败
     @Override
-    public boolean execute(MqMessage mqMessage) {
+    public boolean execute(MqMessage mqMessage) throws Exception {
         //获取消息相关业务信息
         String businessKey1 = mqMessage.getBusinessKey1();
         long courseId = Long.parseLong(businessKey1);
@@ -66,7 +75,7 @@ public class CoursePublishTask extends MessageProcessAbstract {
     }
 
     //生成课程静态化页面并上传至文件系统
-    public void generateCourseHtml(MqMessage mqMessage, long courseId) {
+    public void generateCourseHtml(MqMessage mqMessage, long courseId) throws Exception {
         log.info("开始执行课程静态化任务,id:{}", mqMessage.getId());
         Long taskId = mqMessage.getId();
         MqMessageService mqMessageService = this.getMqMessageService();
@@ -78,8 +87,13 @@ public class CoursePublishTask extends MessageProcessAbstract {
             log.info("课程静态化完成,无需处理");
             return ;
         }
-
-        //开始进行课程静态化
+        //生成html页面
+        File file = coursePublishService.generateCourseHtml(courseId);
+        if(file == null){
+            XueChengPlusException.cast("生成课程静态化页面为空");
+        }
+        //上传到minio
+        coursePublishService.uploadCourseHtml(courseId,file);
 
 
         //将任务状态设置为完成

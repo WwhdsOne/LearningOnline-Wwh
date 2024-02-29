@@ -39,9 +39,11 @@ public class MediaFilesController {
         return mediaFileService.queryMediaFiels(companyId, pageParams, queryMediaParamsDto);
     }
 
+
     @ApiOperation("上传图片")
-    @PostMapping(value = "/upload/coursefile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public UploadFileResultDTO upload(@RequestPart("filedata") MultipartFile file) throws Exception {
+    @RequestMapping(value = "/upload/coursefile",consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public UploadFileResultDTO upload(@RequestPart("filedata") MultipartFile file,
+                                      @RequestParam(value = "objectName", required = false) String objectName) throws Exception {
         Long companyId = 1232141425L;
         //准备上传文件信息
         UploadFileParamsDTO uploadFileParamsDTO = new UploadFileParamsDTO();
@@ -58,7 +60,9 @@ public class MediaFilesController {
         //获取临时文件的绝对路径
         String absoluteFile = tempFile.getAbsolutePath();
         //调用service上传文件
-        return mediaFileService.uploadFile(companyId,uploadFileParamsDTO,absoluteFile);
+        return mediaFileService.uploadFile(companyId, uploadFileParamsDTO, absoluteFile,objectName);
     }
+
+
 
 }

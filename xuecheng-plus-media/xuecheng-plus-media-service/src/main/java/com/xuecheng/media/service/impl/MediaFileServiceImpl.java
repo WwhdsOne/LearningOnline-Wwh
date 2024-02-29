@@ -467,7 +467,7 @@ public class MediaFileServiceImpl implements MediaFileService {
     }
 
     @Override
-    public UploadFileResultDTO uploadFile(Long companyId, UploadFileParamsDTO uploadFileParamsDto, String localFilePath) throws Exception {
+    public UploadFileResultDTO uploadFile(Long companyId, UploadFileParamsDTO uploadFileParamsDto, String localFilePath,String objectName) throws Exception {
         //1.文件上传到Minio
         String fileName = uploadFileParamsDto.getFilename();
         //获取文件拓展名
@@ -480,10 +480,9 @@ public class MediaFileServiceImpl implements MediaFileService {
 
         //获取MD5值
         String fileMd5 = getFileMd5(new File(localFilePath));
-
-        //objectName以年月日作为名称存储
-        String objectName = defaultFolderPath + fileMd5 + extension;
-
+        if(StringUtils.isEmpty(objectName)){
+            objectName =  defaultFolderPath + fileMd5 + extension;
+        }
 
         boolean result = addMediaFilesToMinIO(localFilePath, mimeType, bucket_mediaFiles, objectName);
         if ( !result ) {

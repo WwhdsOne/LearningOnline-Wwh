@@ -35,13 +35,15 @@ public interface MediaFileService {
     PageResult<MediaFiles> queryMediaFiels(Long companyId, PageParams pageParams, QueryMediaParamsDto queryMediaParamsDto);
 
     /**
+     * @param companyId           企业id
      * @param uploadFileParamsDTO 上传文件参数
      * @param localFilePath       本地文件路径
+     * @param objectName          对象名称
      * @return com.xuecheng.media.model.dto.UploadFileResultDTO 上传文件结果
-     * @description 上传文件方法
-     * @date 2024/2/17 18:32
+     * @description 上传文件方法到minio服务器
+     * @date 2022/9/10 9:00
      */
-    UploadFileResultDTO uploadFile(Long companyId, UploadFileParamsDTO uploadFileParamsDTO, String localFilePath) throws Exception;
+    UploadFileResultDTO uploadFile(Long companyId, UploadFileParamsDTO uploadFileParamsDTO, String localFilePath,String objectname) throws Exception;
 
     /**
      * @param companyId           企业id
@@ -107,7 +109,7 @@ public interface MediaFileService {
      * @param localFilePath 本地文件路径
      * @param mimeType 文件类型
      * @param bucketName 桶名称
-     * @param objectName 对象名称
+     * @param objectName 如果传入objectName则使用传入的objectName，否则使用年月日存储
      * @return com.xuecheng.base.model.RestResponse<java.lang.Boolean> true成功，false失败
      */
 
@@ -126,4 +128,6 @@ public interface MediaFileService {
      * @param mediaId 文件id
      */
     MediaFiles getFileById(String mediaId);
+
+
 }
