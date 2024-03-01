@@ -12,6 +12,7 @@ import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -43,9 +44,12 @@ public class CourseBaseInfoController{
         return courseBaseInfoService.createCourseBaseInfo(companyId,addCourseDTO);
     }
 
-    @ApiOperation("单个课程查询接口")
+    @ApiOperation("根据ID查询课程,单个课程查询接口")
     @GetMapping("/course/{courseId}")
     public CourseBaseInfoDTO getCourseById(@PathVariable Long courseId){
+        //SecurityContextHolder底层就是ThreadLocal
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        System.out.println(principal);
         return courseBaseInfoService.getCourseBaseInfo(courseId);
     }
 
