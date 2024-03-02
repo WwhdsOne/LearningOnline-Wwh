@@ -3,8 +3,17 @@
 ### 第二步申请令牌
 POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=authorization_code&code=a1s5mu&redirect_uri=http://www.51xuecheng.cn
 
-### 密码模式
+### 密码模式,错误版
 POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username=zhangsan&password=123
 
+### 密码模式
+POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username={}
+
+################扩展认证请求参数后######################
+###密码模式
+POST {{auth_host}}/auth/oauth/token?client_id=XcWebApp&client_secret=XcWebApp&grant_type=password&username={"username":"t1","authType":"password","password":"111111"}
+
+
+
 ### 校验jwt
-POST {{auth_host}}/auth/oauth/check_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJ6aGFuZ3NhbiIsInNjb3BlIjpbImFsbCJdLCJleHAiOjE3MDkyOTI3OTUsImF1dGhvcml0aWVzIjpbInAxIl0sImp0aSI6ImJiNmFhNjZiLTBiNTQtNDU2OC05YmEyLTZlNTE5ODZiNDc2YyIsImNsaWVudF9pZCI6IlhjV2ViQXBwIn0.4dNOyrnGU7d-La16fB_Urmt6-hr13NYAWt_oc08Zn0s
+POST {{auth_host}}/auth/oauth/check_token?token=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJhdWQiOlsieHVlY2hlbmctcGx1cyJdLCJ1c2VyX25hbWUiOiJ7XCJjb21wYW55SWRcIjpcIjEyMzIxNDE0MjVcIixcImNyZWF0ZVRpbWVcIjpcIjIwMjItMDktMjhUMDg6MzI6MDNcIixcImlkXCI6XCI1MlwiLFwibmFtZVwiOlwiTeiAgeW4iFwiLFwic2V4XCI6XCIxXCIsXCJzdGF0dXNcIjpcIlwiLFwidXNlcm5hbWVcIjpcInQxXCIsXCJ1dHlwZVwiOlwiMTAxMDAyXCJ9Iiwic2NvcGUiOlsiYWxsIl0sImV4cCI6MTcwOTM1NTI2MSwiYXV0aG9yaXRpZXMiOlsidGVzdCJdLCJqdGkiOiI2NjU3Yjc2ZC1iYjI5LTQ1YTQtOGUwNy0wMTVmZjMwYmYzZTkiLCJjbGllbnRfaWQiOiJYY1dlYkFwcCJ9.4a4fX-P2eTmCg7d4lVtOW0IJsXswY_weXaCRgzpfq-A
