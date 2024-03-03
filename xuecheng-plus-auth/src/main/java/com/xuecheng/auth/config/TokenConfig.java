@@ -34,11 +34,14 @@ public class TokenConfig {
     @Autowired
     private JwtAccessTokenConverter accessTokenConverter;
 
+    //令牌存储策略
     @Bean
     public TokenStore tokenStore() {
         return new JwtTokenStore(accessTokenConverter());
     }
 
+
+    //设置签名密钥
     @Bean
     public JwtAccessTokenConverter accessTokenConverter() {
         JwtAccessTokenConverter converter = new JwtAccessTokenConverter();

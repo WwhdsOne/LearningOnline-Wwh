@@ -7,25 +7,23 @@ import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 
 /**
- * @description 安全配置类
  * @author Mr.M
- * @date 2022/9/27 12:07
  * @version 1.0
+ * @description 安全配置类
+ * @date 2022/9/27 12:07
  */
- @EnableWebFluxSecurity
- @Configuration
- public class SecurityConfig {
+@EnableWebFluxSecurity
+@Configuration
+public class SecurityConfig {
 
 
-  //安全拦截配置
-  @Bean
-  public SecurityWebFilterChain webFluxSecurityFilterChain(ServerHttpSecurity http) {
+    //安全拦截配置
+    @Bean
+    public SecurityWebFilterChain webFluxSecurityFilterChain(ServerHttpSecurity http) {
 
-   return http.authorizeExchange()
-           .pathMatchers("/**").permitAll()
-           .anyExchange().authenticated()
-           .and().csrf().disable().build();
-  }
-
-
- }
+        return http.authorizeExchange()
+                .pathMatchers("/**").permitAll()
+                .anyExchange().authenticated()
+                .and().csrf().disable().build();
+    }
+}
