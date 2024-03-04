@@ -158,9 +158,11 @@ public class WxAuthServiceImpl implements AuthService, WxAuthService {
         if (xcUser != null) {
             return xcUser;
         }
-        //向数据库新增记录
         String userId = UUID.randomUUID().toString();
         xcUser = new XcUser();
+        xcUser.setId(userId);
+        xcUser.setWxUnionid(unionid);
+        //记录从微信得到的昵称
         xcUser.setNickname(userInfo_map.get("nickname"));
         xcUser.setUserpic(userInfo_map.get("headimgurl"));
         xcUser.setName(userInfo_map.get("nickname"));

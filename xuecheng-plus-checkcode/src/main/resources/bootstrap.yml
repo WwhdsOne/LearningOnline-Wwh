@@ -1,6 +1,8 @@
 spring:
   application:
     name: checkcode
+  main:
+    allow-bean-definition-overriding: true
   cloud:
     nacos:
       server-addr: 192.168.101.65:8848
@@ -22,6 +24,6 @@ spring:
           - data-id: redis-${spring.profiles.active}.yaml
             group: xuecheng-plus-common
             refresh: true
-
   profiles:
     active: dev
+
