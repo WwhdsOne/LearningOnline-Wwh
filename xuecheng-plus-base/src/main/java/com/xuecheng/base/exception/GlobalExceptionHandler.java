@@ -31,15 +31,21 @@ public class GlobalExceptionHandler {
         return new RestErrorResponse(e.getErrMessage());
     }
 
+
     /**
-     * 系统异常捕获
-     * @param e
+     * 其他异常捕获
+     * @param e 异常
      * @return 错误响应
      */
-    @ExceptionHandler(RuntimeException.class)
+    @ResponseBody
+    @ExceptionHandler(Exception.class)
     @ResponseStatus(HttpStatus.INTERNAL_SERVER_ERROR)
-    public RestErrorResponse customExceptionHandler(RuntimeException e){
-        log.error("系统异常:{}",e.getMessage(),e);
+    public RestErrorResponse exception(Exception e) {
+        log.error("【系统异常】{}",e.getMessage(),e);
+        e.printStackTrace();
+        if(e.getMessage().equals("不允许访问")){
+            return new RestErrorResponse("没有操作此功能的权限");
+        }
         return new RestErrorResponse(CommonError.UNKOWN_ERROR.getErrMessage());
     }
 
@@ -61,4 +67,5 @@ public class GlobalExceptionHandler {
         log.error("系统异常:{}",message);
         return new RestErrorResponse(message);
     }
+
 }

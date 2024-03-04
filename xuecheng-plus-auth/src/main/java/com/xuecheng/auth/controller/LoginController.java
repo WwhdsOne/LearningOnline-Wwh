@@ -1,13 +1,15 @@
 package com.xuecheng.auth.controller;
 
+import com.sun.xml.internal.messaging.saaj.packaging.mime.MessagingException;
 import com.xuecheng.ucenter.mapper.XcUserMapper;
+import com.xuecheng.ucenter.model.dto.FindPswDto;
 import com.xuecheng.ucenter.model.po.XcUser;
+import com.xuecheng.ucenter.service.VerifyService;
+import io.swagger.annotations.ApiOperation;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @author Mr.M
@@ -21,6 +23,9 @@ public class LoginController {
 
     @Autowired
     XcUserMapper userMapper;
+
+    @Autowired
+    VerifyService verifyService;
 
 
     @RequestMapping("/login-success")
@@ -47,6 +52,14 @@ public class LoginController {
     public String r2() {
         return "访问r2资源";
     }
+
+    @ApiOperation(value = "验证验证码是否正确", tags = "验证验证码是否正确")
+    @PostMapping("/findpassword")
+    public void verifyCode(@RequestBody FindPswDto findPswDto) {
+        log.info("验证验证码:{}", findPswDto);
+        verifyService.findPassword(findPswDto);
+    }
+
 
 
 

@@ -31,7 +31,7 @@ public class CourseBaseInfoServiceTest {
         //创建分页查询类
         PageParams pageParams = new PageParams(1L,2L);
 
-        PageResult<CourseBase> result = courseBaseInfoService.queryCourseBaseList(pageParams, queryCourseParamsDto);
+        PageResult<CourseBase> result = courseBaseInfoService.queryCourseBaseList(233L, pageParams, queryCourseParamsDto);
         result.getItems().forEach(System.out::println);
     }
 }

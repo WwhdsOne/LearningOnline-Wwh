@@ -4,3 +4,5 @@ POST {{checkcode_host}}/checkcode/pic
 ### 校验验证码
 POST {{checkcode_host}}/checkcode/verify?key=checkcode:dcb95967f27e4f95a1555e774a6d1ef5&code=AHLB
 
+### 发送验证码
+POST {{checkcode_host}}/checkcode/phone?param1=a1605691832@163.com

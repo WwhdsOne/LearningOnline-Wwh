@@ -63,7 +63,7 @@ public class PasswordAuthServiceImpl implements AuthService {
         String passwordDB = xcUser.getPassword();
         //用户输入密码
         String passwordForm = authParamsDto.getPassword();
-
+ 
         boolean matches = passwordEncoder.matches(passwordForm, passwordDB);
         if ( !matches ) {
             throw new RuntimeException("账号或密码错误");

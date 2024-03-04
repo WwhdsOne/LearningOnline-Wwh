@@ -2,9 +2,11 @@ package com.xuecheng.ucenter.service.impl;
 
 import com.alibaba.fastjson.JSON;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.xuecheng.ucenter.mapper.XcMenuMapper;
 import com.xuecheng.ucenter.mapper.XcUserMapper;
 import com.xuecheng.ucenter.model.dto.AuthParamsDto;
 import com.xuecheng.ucenter.model.dto.XcUserExt;
+import com.xuecheng.ucenter.model.po.XcMenu;
 import com.xuecheng.ucenter.model.po.XcUser;
 import com.xuecheng.ucenter.service.AuthService;
 import lombok.extern.slf4j.Slf4j;
@@ -16,6 +18,9 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * @author Wwh
@@ -33,6 +38,9 @@ public class UserServiceImpl implements UserDetailsService {
 
     @Autowired
     ApplicationContext applicationContext;
+
+    @Autowired
+    private XcMenuMapper xcMenuMapper;
 
     //传入请求对象是authParamDTO
 
@@ -52,9 +60,11 @@ public class UserServiceImpl implements UserDetailsService {
         AuthService authService = applicationContext.getBean(beanName, AuthService.class);
         //执行认证
         XcUserExt xcUserExt = authService.execute(authParamsDto);
+        //根据UserDetails对象生成令牌
         UserDetails userDetails = getUserPrincipal(xcUserExt);
         return userDetails;
     }
+
 
     /**
      * 根据xcUserExt构建UserDetails对象
@@ -66,6 +76,13 @@ public class UserServiceImpl implements UserDetailsService {
         String password = xcUserExt.getPassword();
         //权限
         String[] authorities = {"test"};
+        //根据id查询用户权限
+        List<XcMenu> xcMenus = xcMenuMapper.selectPermissionByUserId(xcUserExt.getId());
+        if(xcMenus != null && !xcMenus.isEmpty() ){
+            //转成数组
+            authorities = xcMenus.stream().map(XcMenu::getCode).toArray(String[]::new);
+        }
+
         //将用户信息转json
         String userJson = JSON.toJSONString(xcUserExt);
         UserDetails userDetails = User
