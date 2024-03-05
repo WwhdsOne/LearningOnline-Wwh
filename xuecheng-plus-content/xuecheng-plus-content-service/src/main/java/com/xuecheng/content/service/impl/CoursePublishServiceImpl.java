@@ -235,6 +235,11 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     }
 
+    @Override
+    public CoursePublish getCoursePublish(Long courseId) {
+        return coursePublishMapper.selectById(courseId);
+    }
+
     /**
      * @param courseId 课程id
      * @return void
