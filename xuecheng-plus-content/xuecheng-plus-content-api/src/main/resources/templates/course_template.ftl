@@ -174,7 +174,7 @@
             <div class="article-cont-catalog">
                 <div class="article-left-box">
                     <div class="content">
-                        <#list model.teachPlans as firstNode>
+                        <#list model.teachplans as firstNode>
                             <div class="item">
                                 <div class="title act"><i class="i-chevron-top"></i>${firstNode.pname}<span class="time">x小时</span></div>
                                 <div class="drop-down" style="height: 260px;">
