@@ -11,7 +11,10 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.xuecheng.base.exception.XueChengPlusException;
 import com.xuecheng.base.utils.IdWorkerUtils;
 import com.xuecheng.base.utils.QRCodeUtil;
+import com.xuecheng.messagesdk.model.po.MqMessage;
+import com.xuecheng.messagesdk.service.MqMessageService;
 import com.xuecheng.orders.config.AlipayConfig;
+import com.xuecheng.orders.config.PayNotifyConfig;
 import com.xuecheng.orders.mapper.XcOrdersGoodsMapper;
 import com.xuecheng.orders.mapper.XcOrdersMapper;
 import com.xuecheng.orders.mapper.XcPayRecordMapper;
@@ -22,6 +25,12 @@ import com.xuecheng.orders.model.po.XcOrders;
 import com.xuecheng.orders.model.po.XcOrdersGoods;
 import com.xuecheng.orders.model.po.XcPayRecord;
 import com.xuecheng.orders.service.OrderService;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.amqp.core.Message;
+import org.springframework.amqp.core.MessageBuilder;
+import org.springframework.amqp.core.MessageDeliveryMode;
+import org.springframework.amqp.rabbit.connection.CorrelationData;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -29,6 +38,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -40,6 +50,7 @@ import java.util.Map;
  * @description 订单服务实现类
  **/
 @Service
+@Slf4j
 public class OrderServiceImpl implements OrderService {
 
 
@@ -54,6 +65,12 @@ public class OrderServiceImpl implements OrderService {
 
     @Autowired
     private OrderService currentProxy;
+
+    @Autowired
+    private RabbitTemplate rabbitTemplate;
+
+    @Autowired
+    MqMessageService mqMessageService;
 
     @Value("${pay.qrcodeurl}")
     private String qrcodeUrl;
@@ -152,7 +169,7 @@ public class OrderServiceImpl implements OrderService {
     @Transactional
     public void saveAliPayStatus(PayStatusDto payStatusDto){
 
-        //如果支付成功
+        //支付记录号
         String payNO = payStatusDto.getOut_trade_no();
         XcPayRecord payRecordByPayno = getPayRecordByPayno(payNO);
         if(payRecordByPayno == null){
@@ -194,9 +211,47 @@ public class OrderServiceImpl implements OrderService {
             if(update1 <= 0){
                 XueChengPlusException.cast("更新订单失败");
             }
+            //保存消息记录,参数1：支付结果通知类型，2: 业务id，3:业务类型
+            MqMessage payresultNotify = mqMessageService.addMessage("payresult_notify",
+                    xcOrders.getOutBusinessId(),
+                    xcOrders.getOrderType(),
+                    null);
+            //发送消息
+            notifyPayResult(payresultNotify);
         }
     }
 
+    @Override
+    public void notifyPayResult(MqMessage message) {
+
+        //消息内容
+        String jsonString = JSON.toJSONString(message);
+
+        Message messageObj = MessageBuilder.withBody(jsonString.getBytes(StandardCharsets.UTF_8))
+                .setDeliveryMode(MessageDeliveryMode.PERSISTENT).build();
+        //全局消息ID
+        Long id = message.getId();
+        CorrelationData correlationData = new CorrelationData();
+        //使用CorrelationData对象指定回调方法
+        correlationData.getFuture().addCallback(
+                result -> {
+                    if(result.isAck()){
+                        //消息成功发送到交换机
+                        log.info("消息成功发送到交换机:{}",jsonString);
+                        //将消息从数据库表删除
+                        mqMessageService.completed(id);
+                    }else{
+                        //消息发送到交换机失败
+                        log.info("消息发送到交换机失败:{}",jsonString);
+                    }
+                },
+                ex -> {
+                    //发生异常了
+                    log.info("消息发送到交换机异常:{}",jsonString);
+                }
+        );
+        rabbitTemplate.convertAndSend(PayNotifyConfig.PAYNOTIFY_EXCHANGE_FANOUT, "", messageObj, correlationData);
+    }
 
 
     @Override
