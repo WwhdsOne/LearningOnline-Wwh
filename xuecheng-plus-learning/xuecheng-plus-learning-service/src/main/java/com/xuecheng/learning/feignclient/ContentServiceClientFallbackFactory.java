@@ -14,6 +14,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class ContentServiceClientFallbackFactory implements FallbackFactory<ContentServiceClient> {
+
     @Override
     public ContentServiceClient create(Throwable throwable) {
         return new ContentServiceClient() {
