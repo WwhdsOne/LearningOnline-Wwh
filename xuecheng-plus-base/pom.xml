@@ -9,10 +9,10 @@
         <!--基于当前地址找父工程pom文件-->
         <relativePath>../xuecheng-plus-parent</relativePath>
     </parent>
-    <packaging>pom</packaging>
-
-
     <artifactId>xuecheng-plus-base</artifactId>
+    <properties>
+        <java.version>1.8</java.version>
+    </properties>
 
     <dependencies>
         <dependency>
