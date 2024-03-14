@@ -28,6 +28,7 @@ import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.freemarker.FreeMarkerTemplateUtils;
@@ -40,6 +41,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author Wwh
@@ -71,6 +73,9 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     @Autowired
     private MqMessageService mqMessageService;
+
+    @Autowired
+    RedisTemplate redisTemplate;
 
     @Autowired
     MediaServiceClient mediaServiceClient;
@@ -183,7 +188,7 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         //配置freemarker
         Configuration configuration = new Configuration(Configuration.VERSION_2_3_30);
         File htmlFile = null;
-        try{
+        try {
 
             //加载模板
             //选指定模板路径,classpath下templates下
@@ -208,12 +213,12 @@ public class CoursePublishServiceImpl implements CoursePublishService {
             //将静态化内容输出到文件中
             InputStream inputStream = IOUtils.toInputStream(content);
             //输出流
-            htmlFile = File.createTempFile("coursepublis",".html");
+            htmlFile = File.createTempFile("coursepublis", ".html");
             //再用拷贝流输出
             FileOutputStream fileOutputStream = new FileOutputStream(htmlFile);
             IOUtils.copy(inputStream, fileOutputStream);
-        }catch (Exception e) {
-            log.info("生成课程静态化页面失败,课程id:{},异常信息:{}", courseId,e.toString());
+        } catch (Exception e) {
+            log.info("生成课程静态化页面失败,课程id:{},异常信息:{}", courseId, e.toString());
             e.printStackTrace();
         }
         return htmlFile;
@@ -224,8 +229,8 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         try {
             MultipartFile multipartFile = MultipartSupportConfig.getMultipartFile(file);
             String upload = mediaServiceClient.upload(multipartFile, "course/" + courseId + ".html");
-            if(StringUtils.isEmpty(upload)){
-                log.info("远程调用走降级逻辑,上传结果为null,课程id:{}",courseId);
+            if ( StringUtils.isEmpty(upload) ) {
+                log.info("远程调用走降级逻辑,上传结果为null,课程id:{}", courseId);
                 XueChengPlusException.cast("上传课程静态化页面失败");
             }
         } catch (Exception e) {
@@ -240,6 +245,27 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         return coursePublishMapper.selectById(courseId);
     }
 
+    @Override
+    public CoursePublish getCoursePublishCache(Long courseId) {
+        synchronized (this) {
+            //查询缓存
+            String jsonString = (String) redisTemplate.opsForValue().get("course:" + courseId);
+            if ( StringUtils.isNotEmpty(jsonString) ) {
+                if ( jsonString.equals("null") ) {
+                    return null;
+                }
+                CoursePublish coursePublish = JSON.parseObject(jsonString, CoursePublish.class);
+                return coursePublish;
+            } else {
+                //从数据库查询
+                System.out.println("从数据库查询数据...");
+                CoursePublish coursePublish = getCoursePublish(courseId);
+                //设置过期时间300秒
+                redisTemplate.opsForValue().set("course:" + courseId, JSON.toJSONString(coursePublish), 300, TimeUnit.SECONDS);
+                return coursePublish;
+            }
+        }
+    }
     /**
      * @param courseId 课程id
      * @return void

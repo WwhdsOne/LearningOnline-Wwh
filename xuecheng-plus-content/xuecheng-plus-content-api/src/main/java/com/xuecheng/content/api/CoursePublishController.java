@@ -85,8 +85,14 @@ public class CoursePublishController {
     public CoursePreviewDTO getCoursePublish(@PathVariable("courseId") Long courseId) {
         //封装数据
         CoursePreviewDTO coursePreviewDTO = new CoursePreviewDTO();
+
+
         //查询课程发布表
-        CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
+        //CoursePublish coursePublish = coursePublishService.getCoursePublish(courseId);
+
+
+        //查询课程基本信息(缓存)
+        CoursePublish coursePublish = coursePublishService.getCoursePublishCache(courseId);
         if(coursePublish == null){
             return coursePreviewDTO;
         }
