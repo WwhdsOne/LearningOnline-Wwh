@@ -26,6 +26,8 @@ import freemarker.template.Template;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.redisson.api.RLock;
+import org.redisson.api.RedissonClient;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -79,6 +81,9 @@ public class CoursePublishServiceImpl implements CoursePublishService {
 
     @Autowired
     MediaServiceClient mediaServiceClient;
+
+    @Autowired
+    RedissonClient redissonClient;
 
 
     @Override
@@ -245,27 +250,63 @@ public class CoursePublishServiceImpl implements CoursePublishService {
         return coursePublishMapper.selectById(courseId);
     }
 
-    @Override
-    public CoursePublish getCoursePublishCache(Long courseId) {
-        synchronized (this) {
-            //查询缓存
-            String jsonString = (String) redisTemplate.opsForValue().get("course:" + courseId);
-            if ( StringUtils.isNotEmpty(jsonString) ) {
-                if ( jsonString.equals("null") ) {
-                    return null;
+    //分布式锁查询数据库
+    public  CoursePublish getCoursePublishCache(Long courseId){
+        //查询缓存
+        String jsonString = (String) redisTemplate.opsForValue().get("course:" + courseId);
+        if(StringUtils.isNotEmpty(jsonString)){
+            if(jsonString.equals("null")){
+                return null;
+            }
+            CoursePublish coursePublish = JSON.parseObject(jsonString, CoursePublish.class);
+            return coursePublish;
+        }else{
+            //每门课程设置一个锁
+            RLock lock = redissonClient.getLock("coursequerylock:"+courseId);
+            //获取锁
+            lock.lock();
+            try {
+                jsonString = (String) redisTemplate.opsForValue().get("course:" + courseId);
+                if(StringUtils.isNotEmpty(jsonString)){
+                    CoursePublish coursePublish = JSON.parseObject(jsonString, CoursePublish.class);
+                    return coursePublish;
                 }
-                CoursePublish coursePublish = JSON.parseObject(jsonString, CoursePublish.class);
-                return coursePublish;
-            } else {
+                System.out.println("=========从数据库查询==========");
                 //从数据库查询
-                System.out.println("从数据库查询数据...");
                 CoursePublish coursePublish = getCoursePublish(courseId);
-                //设置过期时间300秒
-                redisTemplate.opsForValue().set("course:" + courseId, JSON.toJSONString(coursePublish), 300, TimeUnit.SECONDS);
+                redisTemplate.opsForValue().set("course:" + courseId, JSON.toJSONString(coursePublish),1,TimeUnit.DAYS);
                 return coursePublish;
+            }finally {
+                //释放锁
+                lock.unlock();
             }
         }
     }
+//    //本地锁方式查询数据库
+//    @Override
+//    public CoursePublish getCoursePublishCache(Long courseId) {
+//        synchronized (this) {
+//            //查询缓存
+//            String jsonString = (String) redisTemplate.opsForValue().get("course:" + courseId);
+//            if ( StringUtils.isNotEmpty(jsonString) ) {
+//                if ( jsonString.equals("null") ) {
+//                    return null;
+//                }
+//                CoursePublish coursePublish = JSON.parseObject(jsonString, CoursePublish.class);
+//                return coursePublish;
+//            } else {
+//                //调用redis方法,执行setnx命令,谁执行成功谁能拿到锁
+//                Boolean aNull = redisTemplate.opsForValue().setIfAbsent("coursequerylock:" + courseId, "null", 300, TimeUnit.SECONDS);
+//                //从数据库查询
+//                System.out.println("从数据库查询数据...");
+//                CoursePublish coursePublish = getCoursePublish(courseId);
+//                //设置过期时间300秒
+//                redisTemplate.opsForValue().set("course:" + courseId, JSON.toJSONString(coursePublish), 300, TimeUnit.SECONDS);
+//                return coursePublish;
+//            }
+//        }
+//    }
+
     /**
      * @param courseId 课程id
      * @return void
