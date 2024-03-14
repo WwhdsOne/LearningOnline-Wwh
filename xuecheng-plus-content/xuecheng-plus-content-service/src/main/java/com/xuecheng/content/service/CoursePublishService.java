@@ -64,4 +64,12 @@ public interface CoursePublishService {
      */
 
     CoursePublish getCoursePublish(Long courseId);
+
+    /**
+     * @description 获取课程发布信息
+     * @param courseId 课程id
+     * @return com.xuecheng.content.model.po.CoursePublish 课程发布信息
+     */
+
+    CoursePublish getCoursePublishCache(Long courseId);
 }
